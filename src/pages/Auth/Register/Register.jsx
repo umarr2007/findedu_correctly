@@ -136,7 +136,7 @@ const Register = () => {
             required
           >
             <option value="USER">USER</option>
-            <option value="ADMIN">CEO</option>
+            <option value="CEO">CEO</option>
           </select>
           <input
             type="password"

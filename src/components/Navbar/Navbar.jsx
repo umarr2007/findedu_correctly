@@ -1,13 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import QueueModal from "./QueueModal";
+import { toast } from "react-toastify"; // bu import borligiga ishonch hosil qiling
+import ReceptionModal from "../../components/ReceptionModal";
+import axios from "axios";
 
 const Navbar = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showCeoDropdown, setShowCeoDropdown] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
+  const [majors, setMajors] = useState([]);
+  const [centerId] = useState(1); // test uchun 1, kerakli id bo'lsa shu yerga o'zgartiring
 
   const fetchUserData = async () => {
     const token = localStorage.getItem("token");
@@ -31,6 +39,7 @@ const Navbar = () => {
 
       if (response.ok) {
         const userData = {
+          id: data.id || data.data?.id,
           firstName: data.firstName || data.data?.firstName,
           lastName: data.lastName || data.data?.lastName,
           email: data.email || data.data?.email,
@@ -75,6 +84,18 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const fetchMajors = async () => {
+      try {
+        const res = await axios.get("https://findcourse.net.uz/api/major");
+        if (res.data?.data) setMajors(res.data.data);
+      } catch (err) {
+        setMajors([]);
+      }
+    };
+    fetchMajors();
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -97,10 +118,53 @@ const Navbar = () => {
             <Link to="/" className="hover:text-blue-600 transition">
               Bosh sahifa
             </Link>
-           
-            <Link to="/about" className="hover:text-blue-600 transition">Biz haqimizda</Link>
-            <Link to="/resources" className="hover:text-blue-600 transition">Resurslar</Link>
-            <Link to="/liked" className="hover:text-blue-600 transition">Sevimlilar</Link>
+            <Link to="/about" className="hover:text-blue-600 transition">
+              Biz haqimizda
+            </Link>
+            <Link to="/resources" className="hover:text-blue-600 transition">
+              Resurslar
+            </Link>
+            <Link to="/liked" className="hover:text-blue-600 transition">
+              Sevimlilar
+            </Link>
+            <Link
+              to="#"
+              className="hover:text-blue-600 transition"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsQueueModalOpen(true);
+              }}
+            >
+              Navbatlar
+            </Link>
+            {user?.role === "CEO" && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowCeoDropdown((v) => !v)}
+                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                >
+                  CEO
+                </button>
+                {showCeoDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                    <Link
+                      to="/ceo/centers"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowCeoDropdown(false)}
+                    >
+                      Markazlarim
+                    </Link>
+                    <Link
+                      to="/ceo/add-center"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowCeoDropdown(false)}
+                    >
+                      Markaz qo'shish
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           <div className="flex items-center gap-4 relative" ref={dropdownRef}>
@@ -162,6 +226,21 @@ const Navbar = () => {
             )}
           </div>
         </div>
+
+        {isQueueModalOpen && (
+          <QueueModal
+            onClose={() => setIsQueueModalOpen(false)}
+            centerId={centerId}
+            majors={majors}
+          />
+        )}
+
+        <ReceptionModal
+          open={isQueueModalOpen}
+          onClose={() => setIsQueueModalOpen(false)}
+          centerId={centerId}
+          majors={majors}
+        />
       </div>
     </header>
   );

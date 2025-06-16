@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Comments from "../../components/Comments/Comments";
-
+import ReceptionModal from "../../components/ReceptionModal";
 const CenterDetail = () => {
   const { id } = useParams();
   const [center, setCenter] = useState(null);
@@ -14,6 +14,7 @@ const CenterDetail = () => {
     schedule: false,
     facilities: false,
   });
+  const [isReceptionModalOpen, setIsReceptionModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCenter = async () => {
@@ -156,7 +157,12 @@ const CenterDetail = () => {
                   </p>
 
                   <div className="mt-8">
-                    <button className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">Darsga yozilish </button>
+                    <button 
+                      onClick={() => setIsReceptionModalOpen(true)}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                    >
+                      Darsga yozilish
+                    </button>
                   </div>
                 </div>
               </div>
@@ -192,6 +198,12 @@ const CenterDetail = () => {
           </div>
         </div>
       </div>
+
+      <ReceptionModal 
+        isOpen={isReceptionModalOpen}
+        onClose={() => setIsReceptionModalOpen(false)}
+        centerId={center?.id}
+      />
     </div>
   );
 };

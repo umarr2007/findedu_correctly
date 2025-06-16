@@ -36,7 +36,7 @@ const Login = () => {
 
       if (response.ok && data.accessToken) {
         localStorage.setItem("token", data.accessToken);
-        navigate("/"); // reload keraksiz
+        navigate("/"); 
       } else {
         setError(data?.message || data?.error || "Email yoki parol noto‘g‘ri");
       }

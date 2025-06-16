@@ -2,6 +2,8 @@ import React from "react";
 import { Form, Input, Button, message, Typography } from "antd";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // 🔥 toast import qilindi
+import "react-toastify/dist/ReactToastify.css";
 
 const { Title } = Typography;
 
@@ -12,6 +14,7 @@ const Verifyotp = () => {
   const onFinish = async (values) => {
     if (!email) {
       message.error("Email topilmadi. Qayta ro‘yxatdan o‘ting.");
+      toast.error("Email topilmadi. Qayta ro‘yxatdan o‘ting."); // 🔥 toast
       return;
     }
 
@@ -25,16 +28,17 @@ const Verifyotp = () => {
 
       if (response.data && response.data.success && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
-
-        message.success("Tasdiqlash muvaffaqiyatli!");
+        toast.success("Kod tasdiqlandi!"); // 🔥 toast
         localStorage.removeItem("email");
         localStorage.removeItem("password");
       } else {
         message.error("OTP noto‘g‘ri yoki token yo‘q");
+        toast.error("OTP noto‘g‘ri yoki token yo‘q"); // 🔥 toast
       }
     } catch (error) {
       console.error("Xato:", error);
       message.error("Tasdiqlashda xatolik yuz berdi");
+      toast.error("Tasdiqlashda xatolik yuz berdi"); // 🔥 toast
     }
   };
 
